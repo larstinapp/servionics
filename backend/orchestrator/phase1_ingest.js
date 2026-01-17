@@ -16,7 +16,8 @@ const config = require('../config/nvidia.config');
 const path = require('path');
 const fs = require('fs');
 const { execSync, exec } = require('child_process');
-const imageAnalyzer = require('../utils/imageAnalyzer'); // NEU: Sharp-basierte Bildanalyse
+const imageAnalyzer = require('../utils/imageAnalyzer'); // Sharp-basierte Bildanalyse
+const splattingAnalyzer = require('../utils/splattingAnalyzer'); // NEU: Gaussian Splatting Eignungsprüfung
 
 class Phase1Ingest {
     /**
@@ -31,47 +32,85 @@ class Phase1Ingest {
         const metadata = await this.extractMetadata(videoPath);
         console.log(`[Phase1] Metadata: ${metadata.duration}s, ${metadata.fps}fps, ${metadata.width}x${metadata.height}`);
 
-        const keyframes = await this.extractKeyframes(videoPath, metadata);
+        // Extract keyframes WITH paths for splatting analysis
+        const { keyframes, keyframePaths, tempDir } = await this.extractKeyframesWithPaths(videoPath, metadata);
         console.log(`[Phase1] Extracted ${keyframes.length} keyframes`);
 
-        // Run quality checks
+        // Run basic quality checks
         const brightnessScore = this.analyzeBrightness(keyframes);
         const blurScore = this.analyzeMotionBlur(keyframes);
         const frameScore = this.analyzeFrameCount(metadata);
         const consistencyScore = this.analyzeConsistency(keyframes);
 
-        // Calculate overall score (weighted average)
-        const overallScore = Math.round(
+        // Calculate basic quality score (weighted average)
+        const basicScore = Math.round(
             brightnessScore * 0.25 +
             blurScore * 0.30 +
             frameScore * 0.25 +
             consistencyScore * 0.20
         );
 
-        // Determine quality level
+        // NEW: Run Gaussian Splatting suitability analysis
+        console.log(`[Phase1] Running Gaussian Splatting suitability analysis...`);
+        let splattingAnalysis = null;
+        try {
+            splattingAnalysis = await splattingAnalyzer.analyze(keyframes, keyframePaths, metadata);
+            console.log(`[Phase1] Splatting Score: ${splattingAnalysis.splattingScore}/100 (${splattingAnalysis.splattingLevel})`);
+        } catch (error) {
+            console.error(`[Phase1] Splatting analysis failed:`, error.message);
+            splattingAnalysis = {
+                splattingScore: 50,
+                splattingLevel: 'unknown',
+                recommendation: { status: 'error', message: 'Analyse fehlgeschlagen', tips: [] }
+            };
+        }
+
+        // Cleanup temp keyframe files
+        this.cleanupTempDir(tempDir);
+
+        // Combined score: 60% basic quality, 40% splatting suitability
+        const overallScore = Math.round(basicScore * 0.6 + splattingAnalysis.splattingScore * 0.4);
         const level = this.getQualityLevel(overallScore);
 
-        // Generate feedback
-        const feedback = this.generateFeedback({
+        // Generate combined feedback
+        const basicFeedback = this.generateFeedback({
             brightness: brightnessScore,
             blur: blurScore,
             frames: frameScore,
             consistency: consistencyScore
         });
 
+        // Merge suggestions from both analyses
+        const allSuggestions = [
+            ...basicFeedback.suggestions,
+            ...(splattingAnalysis.recommendation?.tips || [])
+        ].slice(0, 5); // Max 5 suggestions
+
         return {
             score: overallScore,
             level, // 'good' | 'medium' | 'poor'
-            metrics: {
-                brightness: brightnessScore,
-                motionBlur: blurScore,
-                frameCount: frameScore,
-                consistency: consistencyScore
+            basicQuality: {
+                score: basicScore,
+                metrics: {
+                    brightness: brightnessScore,
+                    motionBlur: blurScore,
+                    frameCount: frameScore,
+                    consistency: consistencyScore
+                }
             },
-            feedback: feedback.message,
-            suggestions: feedback.suggestions,
+            splattingSuitability: {
+                score: splattingAnalysis.splattingScore,
+                level: splattingAnalysis.splattingLevel,
+                checks: splattingAnalysis.checks,
+                estimatedQuality: splattingAnalysis.estimatedQuality
+            },
+            feedback: splattingAnalysis.splattingScore < 60
+                ? splattingAnalysis.recommendation?.message
+                : basicFeedback.message,
+            suggestions: allSuggestions,
             keyframeCount: keyframes.length,
-            duration: metadata.duration
+            duration: metadata.duration,
+            resolution: { width: metadata.width, height: metadata.height }
         };
     }
 
@@ -125,12 +164,13 @@ class Phase1Ingest {
     }
 
     /**
-     * Extract keyframes from video using FFmpeg
-     * ERKLÄRUNG: Extrahiert alle X Sekunden ein Bild und analysiert Helligkeit
+     * Extract keyframes from video using FFmpeg - returns paths for splatting analysis
+     * HINWEIS: Cleanup muss vom Aufrufer gemacht werden!
      */
-    async extractKeyframes(videoPath, metadata) {
+    async extractKeyframesWithPaths(videoPath, metadata) {
         const keyframes = [];
-        const tempDir = path.join(config.output.uploads, 'keyframes_temp');
+        const keyframePaths = [];
+        const tempDir = path.join(config.output.uploads, 'keyframes_temp_' + Date.now());
 
         try {
             // Erstelle temp-Ordner
@@ -157,9 +197,9 @@ class Phase1Ingest {
 
             for (let i = 0; i < files.length; i++) {
                 const filePath = path.join(tempDir, files[i]);
+                keyframePaths.push(filePath); // Speichere Pfad für Splatting-Analyse
 
-                // NEU: Echte Pixel-Analyse mit Sharp statt Dateigröße-Heuristik!
-                // Das ist der Kern von Sprint 2.2
+                // Echte Pixel-Analyse mit Sharp
                 const analysis = await imageAnalyzer.analyzeImage(filePath);
 
                 keyframes.push({
@@ -178,9 +218,6 @@ class Phase1Ingest {
                 }
             }
 
-            // Cleanup: Lösche temp-Ordner
-            this.cleanupTempDir(tempDir);
-
         } catch (error) {
             console.error('[Phase1] Keyframe extraction error:', error.message);
             // Fallback: Mock-Daten
@@ -194,7 +231,8 @@ class Phase1Ingest {
             }
         }
 
-        return keyframes;
+        // WICHTIG: Pfade und tempDir zurückgeben, cleanup macht der Aufrufer!
+        return { keyframes, keyframePaths, tempDir };
     }
 
     /**
