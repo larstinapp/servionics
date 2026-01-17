@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Servionics Dashboard - Projekt-Monitoring und KPIs für Ihre Automatisierungslösung.">
+    <meta name="robots" content="noindex, nofollow">
+
+    <title>Dashboard | Servionics</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <link rel="stylesheet" href="styles/pages.css">
+    <link rel="stylesheet" href="styles/dashboard.css">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚙️</text></svg>">
+</head>
+
+<body class="dashboard-page">
+    <!-- Navigation -->
+    <nav class="navbar scrolled">
+        <div class="container navbar__inner">
+            <a href="index.html" class="navbar__logo">
+                <span class="navbar__logo-icon">S</span>
+                <span>Servionics</span>
+            </a>
+
+            <div class="navbar__links">
+                <a href="index.html" class="navbar__link">Startseite</a>
+                <a href="index.html#skills" class="navbar__link">Einsatzfelder</a>
+                <a href="dashboard.html" class="navbar__link navbar__link--active">Dashboard</a>
+            </div>
+
+            <div class="navbar__cta">
+                <div class="navbar__user">
+                    <span class="navbar__user-avatar">TM</span>
+                    <span class="navbar__user-name">Thomas Müller</span>
+                </div>
+            </div>
+
+            <button class="navbar__toggle" aria-label="Menü öffnen">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Dashboard Header -->
+    <header class="dashboard-header">
+        <div class="container">
+            <div class="dashboard-header__content">
+                <div class="dashboard-header__text">
+                    <h1 class="dashboard-header__title">Dashboard</h1>
+                    <p class="dashboard-header__subtitle">Willkommen zurück, Thomas! Hier ist Ihr Projektüberblick.</p>
+                </div>
+                <div class="dashboard-header__actions">
+                    <a href="index.html#project-check" class="btn btn--primary">
+                        + Neues Projekt
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Dashboard Content -->
+    <main class="dashboard-main">
+        <div class="container">
+            <!-- KPI Cards -->
+            <section class="dashboard-section">
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-card__icon kpi-card__icon--accent">📊</div>
+                        <div class="kpi-card__content">
+                            <span class="kpi-card__value" data-counter="3">0</span>
+                            <span class="kpi-card__label">Aktive Projekte</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-card__icon kpi-card__icon--success">✅</div>
+                        <div class="kpi-card__content">
+                            <span class="kpi-card__value" data-counter="12">0</span>
+                            <span class="kpi-card__label">Abgeschlossen</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-card__icon kpi-card__icon--warning">⏱️</div>
+                        <div class="kpi-card__content">
+                            <span class="kpi-card__value">8,5</span>
+                            <span class="kpi-card__unit">Tage</span>
+                            <span class="kpi-card__label">Ø Go-Live Zeit</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-card__icon kpi-card__icon--primary">💰</div>
+                        <div class="kpi-card__content">
+                            <span class="kpi-card__value">-32%</span>
+                            <span class="kpi-card__label">Personalkosten</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Projects Section -->
+            <section class="dashboard-section">
+                <div class="dashboard-section__header">
+                    <h2 class="dashboard-section__title">Ihre Projekte</h2>
+                    <div class="dashboard-section__filters">
+                        <button class="filter-btn filter-btn--active">Alle</button>
+                        <button class="filter-btn">Aktiv</button>
+                        <button class="filter-btn">Abgeschlossen</button>
+                    </div>
+                </div>
+
+                <div class="project-grid">
+                    <!-- Project 1: Active -->
+                    <div class="project-card project-card--active">
+                        <div class="project-card__header">
+                            <div class="project-card__status">
+                                <span class="status-dot status-dot--active"></span>
+                                <span>In Umsetzung</span>
+                            </div>
+                            <span class="project-card__id">#PRJ-2024-003</span>
+                        </div>
+
+                        <h3 class="project-card__title">CNC Maschinenbeladung</h3>
+                        <p class="project-card__location">📍 Werk Süd, Halle 3</p>
+
+                        <div class="project-card__progress">
+                            <div class="progress-bar">
+                                <div class="progress-bar__fill" style="width: 75%"></div>
+                            </div>
+                            <div class="progress-bar__labels">
+                                <span>Fortschritt</span>
+                                <span>75%</span>
+                            </div>
+                        </div>
+
+                        <div class="project-card__meta">
+                            <div class="project-card__meta-item">
+                                <span class="project-card__meta-label">Skill</span>
+                                <span class="project-card__meta-value">🔧 Maschinenbeladung</span>
+                            </div>
+                            <div class="project-card__meta-item">
+                                <span class="project-card__meta-label">Go-Live</span>
+                                <span class="project-card__meta-value">15. Jan 2026</span>
+                            </div>
+                        </div>
+
+                        <div class="project-card__actions">
+                            <button class="btn btn--ghost btn--small">Details</button>
+                            <button class="btn btn--secondary btn--small">Support</button>
+                        </div>
+                    </div>
+
+                    <!-- Project 2: Active -->
+                    <div class="project-card project-card--active">
+                        <div class="project-card__header">
+                            <div class="project-card__status">
+                                <span class="status-dot status-dot--pending"></span>
+                                <span>Vor-Ort-Check geplant</span>
+                            </div>
+                            <span class="project-card__id">#PRJ-2024-004</span>
+                        </div>
+
+                        <h3 class="project-card__title">Palettier-Station</h3>
+                        <p class="project-card__location">📍 Logistikzentrum Nord</p>
+
+                        <div class="project-card__progress">
+                            <div class="progress-bar">
+                                <div class="progress-bar__fill" style="width: 35%"></div>
+                            </div>
+                            <div class="progress-bar__labels">
+                                <span>Fortschritt</span>
+                                <span>35%</span>
+                            </div>
+                        </div>
+
+                        <div class="project-card__meta">
+                            <div class="project-card__meta-item">
+                                <span class="project-card__meta-label">Skill</span>
+                                <span class="project-card__meta-value">🎯 Palettieren</span>
+                            </div>
+                            <div class="project-card__meta-item">
+                                <span class="project-card__meta-label">Go-Live</span>
+                                <span class="project-card__meta-value">22. Jan 2026</span>
+                            </div>
+                        </div>
+
+                        <div class="project-card__actions">
+                            <button class="btn btn--ghost btn--small">Details</button>
+                            <button class="btn btn--secondary btn--small">Support</button>
+                        </div>
+                    </div>
+
+                    <!-- Project 3: Completed -->
+                    <div class="project-card project-card--completed">
+                        <div class="project-card__header">
+                            <div class="project-card__status">
+                                <span class="status-dot status-dot--success"></span>
+                                <span>Abgeschlossen</span>
+                            </div>
+                            <span class="project-card__id">#PRJ-2024-002</span>
+                        </div>
+
+                        <h3 class="project-card__title">Pick & Place Montage</h3>
+                        <p class="project-card__location">📍 Werk Süd, Halle 1</p>
+
+                        <div class="project-card__progress">
+                            <div class="progress-bar progress-bar--success">
+                                <div class="progress-bar__fill" style="width: 100%"></div>
+                            </div>
+                            <div class="progress-bar__labels">
+                                <span>Abgeschlossen</span>
+                                <span>100%</span>
+                            </div>
+                        </div>
+
+                        <div class="project-card__meta">
+                            <div class="project-card__meta-item">
+                                <span class="project-card__meta-label">Skill</span>
+                                <span class="project-card__meta-value">📦 Pick & Place</span>
+                            </div>
+                            <div class="project-card__meta-item">
+                                <span class="project-card__meta-label">Go-Live</span>
+                                <span class="project-card__meta-value">02. Jan 2026</span>
+                            </div>
+                        </div>
+
+                        <div class="project-card__actions">
+                            <button class="btn btn--ghost btn--small">Bericht</button>
+                            <button class="btn btn--secondary btn--small">Monitoring</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Two Column Layout: Activity + Support -->
+            <div class="dashboard-two-col">
+                <!-- Activity Timeline -->
+                <section class="dashboard-section">
+                    <div class="dashboard-section__header">
+                        <h2 class="dashboard-section__title">Aktivität</h2>
+                        <a href="#" class="dashboard-section__link">Alle anzeigen →</a>
+                    </div>
+
+                    <div class="activity-timeline">
+                        <div class="activity-item">
+                            <div class="activity-item__icon activity-item__icon--success">✓</div>
+                            <div class="activity-item__content">
+                                <p class="activity-item__text"><strong>Vor-Ort-Check abgeschlossen</strong> für CNC
+                                    Maschinenbeladung</p>
+                                <span class="activity-item__time">Vor 2 Stunden</span>
+                            </div>
+                        </div>
+
+                        <div class="activity-item">
+                            <div class="activity-item__icon activity-item__icon--info">📹</div>
+                            <div class="activity-item__content">
+                                <p class="activity-item__text"><strong>Neues Video hochgeladen</strong> für
+                                    Palettier-Station</p>
+                                <span class="activity-item__time">Gestern, 14:30</span>
+                            </div>
+                        </div>
+
+                        <div class="activity-item">
+                            <div class="activity-item__icon activity-item__icon--accent">🤖</div>
+                            <div class="activity-item__content">
+                                <p class="activity-item__text"><strong>AI-Analyse fertig</strong> – Angebot bereit zur
+                                    Prüfung</p>
+                                <span class="activity-item__time">Gestern, 14:35</span>
+                            </div>
+                        </div>
+
+                        <div class="activity-item">
+                            <div class="activity-item__icon activity-item__icon--success">🚀</div>
+                            <div class="activity-item__content">
+                                <p class="activity-item__text"><strong>Projekt #PRJ-2024-002</strong> erfolgreich in
+                                    Betrieb genommen</p>
+                                <span class="activity-item__time">02. Jan 2026</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Support Tickets -->
+                <section class="dashboard-section">
+                    <div class="dashboard-section__header">
+                        <h2 class="dashboard-section__title">Support</h2>
+                        <button class="btn btn--ghost btn--small">+ Neues Ticket</button>
+                    </div>
+
+                    <div class="ticket-list">
+                        <div class="ticket-item ticket-item--open">
+                            <div class="ticket-item__header">
+                                <span class="ticket-item__id">#TKT-089</span>
+                                <span class="ticket-badge ticket-badge--open">Offen</span>
+                            </div>
+                            <h4 class="ticket-item__title">Greifer-Kalibrierung erforderlich</h4>
+                            <p class="ticket-item__project">CNC Maschinenbeladung</p>
+                            <div class="ticket-item__footer">
+                                <span class="ticket-item__priority ticket-priority--medium">● Mittel</span>
+                                <span class="ticket-item__time">Vor 4 Std.</span>
+                            </div>
+                        </div>
+
+                        <div class="ticket-item ticket-item--resolved">
+                            <div class="ticket-item__header">
+                                <span class="ticket-item__id">#TKT-088</span>
+                                <span class="ticket-badge ticket-badge--resolved">Gelöst</span>
+                            </div>
+                            <h4 class="ticket-item__title">Sensor-Neustart nach Wartung</h4>
+                            <p class="ticket-item__project">Pick & Place Montage</p>
+                            <div class="ticket-item__footer">
+                                <span class="ticket-item__priority ticket-priority--low">● Niedrig</span>
+                                <span class="ticket-item__time">Gestern</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="support-contact">
+                        <p class="support-contact__text">Direkter Support</p>
+                        <a href="tel:+4989123456789" class="support-contact__phone">📞 +49 89 123 456 789</a>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Performance Charts (Placeholder) -->
+            <section class="dashboard-section">
+                <div class="dashboard-section__header">
+                    <h2 class="dashboard-section__title">Performance-Übersicht</h2>
+                    <div class="dashboard-section__filters">
+                        <button class="filter-btn filter-btn--active">7 Tage</button>
+                        <button class="filter-btn">30 Tage</button>
+                        <button class="filter-btn">90 Tage</button>
+                    </div>
+                </div>
+
+                <div class="performance-grid">
+                    <!-- OEE Gauge -->
+                    <div class="performance-card">
+                        <h4 class="performance-card__title">OEE (Overall Equipment Effectiveness)</h4>
+                        <div class="gauge">
+                            <svg class="gauge__svg" viewBox="0 0 120 120">
+                                <circle class="gauge__bg" cx="60" cy="60" r="50" />
+                                <circle class="gauge__fill gauge__fill--success" cx="60" cy="60" r="50"
+                                    stroke-dasharray="251.2" stroke-dashoffset="50.24" />
+                            </svg>
+                            <div class="gauge__value">
+                                <span class="gauge__number">80%</span>
+                                <span class="gauge__label">Gut</span>
+                            </div>
+                        </div>
+                        <div class="performance-card__change performance-card__change--up">
+                            ↑ +5% vs. Vorwoche
+                        </div>
+                    </div>
+
+                    <!-- Availability -->
+                    <div class="performance-card">
+                        <h4 class="performance-card__title">Verfügbarkeit</h4>
+                        <div class="gauge">
+                            <svg class="gauge__svg" viewBox="0 0 120 120">
+                                <circle class="gauge__bg" cx="60" cy="60" r="50" />
+                                <circle class="gauge__fill gauge__fill--accent" cx="60" cy="60" r="50"
+                                    stroke-dasharray="251.2" stroke-dashoffset="25.12" />
+                            </svg>
+                            <div class="gauge__value">
+                                <span class="gauge__number">90%</span>
+                                <span class="gauge__label">Exzellent</span>
+                            </div>
+                        </div>
+                        <div class="performance-card__change performance-card__change--up">
+                            ↑ +2% vs. Vorwoche
+                        </div>
+                    </div>
+
+                    <!-- Cycle Time -->
+                    <div class="performance-card">
+                        <h4 class="performance-card__title">Zykluszeit</h4>
+                        <div class="gauge">
+                            <svg class="gauge__svg" viewBox="0 0 120 120">
+                                <circle class="gauge__bg" cx="60" cy="60" r="50" />
+                                <circle class="gauge__fill gauge__fill--warning" cx="60" cy="60" r="50"
+                                    stroke-dasharray="251.2" stroke-dashoffset="100.48" />
+                            </svg>
+                            <div class="gauge__value">
+                                <span class="gauge__number">12s</span>
+                                <span class="gauge__label">Pro Teil</span>
+                            </div>
+                        </div>
+                        <div class="performance-card__change performance-card__change--down">
+                            ↓ -0.5s optimiert
+                        </div>
+                    </div>
+
+                    <!-- Parts Produced -->
+                    <div class="performance-card">
+                        <h4 class="performance-card__title">Produzierte Teile</h4>
+                        <div class="big-number">
+                            <span class="big-number__value" data-counter="4823">0</span>
+                            <span class="big-number__unit">Teile</span>
+                        </div>
+                        <div class="big-number__sub">Diese Woche</div>
+                        <div class="performance-card__change performance-card__change--up">
+                            ↑ +340 vs. Vorwoche
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer footer--dashboard">
+        <div class="container">
+            <div class="footer__bottom">
+                <p class="footer__copyright">
+                    © 2026 Servionics GmbH. Alle Rechte vorbehalten.
+                </p>
+                <nav class="footer__legal">
+                    <a href="#" class="footer__legal-link">Impressum</a>
+                    <a href="#" class="footer__legal-link">Datenschutz</a>
+                    <a href="#" class="footer__legal-link">Support</a>
+                </nav>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="scripts/main.js"></script>
+    <script src="scripts/dashboard.js"></script>
+</body>
+
+</html>

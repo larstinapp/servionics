@@ -1,0 +1,88 @@
+{
+  "skills": {
+    "pick-place": {
+      "name": "Pick & Place",
+      "icon": "📦",
+      "description": "Automatisiertes Greifen und Platzieren von Werkstücken",
+      "hardware": {
+        "robot": "UR10e",
+        "gripper": "vacuum",
+        "payload": "12.5kg"
+      },
+      "template": "pick_place_cell.usd",
+      "safetyZone": 1.5,
+      "typicalCycleTime": 4.5,
+      "deliveryDays": {
+        "min": 7,
+        "max": 10
+      },
+      "pricing": {
+        "setupCost": 25000,
+        "monthlyCost": 2500
+      }
+    },
+    "palletizing": {
+      "name": "Palettieren",
+      "icon": "🎯",
+      "description": "Automatisches Stapeln und Palettieren von Kartons",
+      "hardware": {
+        "robot": "UR10e",
+        "gripper": "pallet",
+        "payload": "12.5kg"
+      },
+      "template": "palletizer_cell.usd",
+      "safetyZone": 2.0,
+      "typicalCycleTime": 6.0,
+      "deliveryDays": {
+        "min": 10,
+        "max": 14
+      },
+      "pricing": {
+        "setupCost": 35000,
+        "monthlyCost": 3200
+      }
+    },
+    "machine-loading": {
+      "name": "Maschinenbeladung",
+      "icon": "🔧",
+      "description": "Be- und Entladen von CNC und Werkzeugmaschinen",
+      "hardware": {
+        "robot": "UR10e",
+        "gripper": "parallel",
+        "payload": "12.5kg"
+      },
+      "template": "loader_cell.usd",
+      "safetyZone": 1.5,
+      "typicalCycleTime": 8.0,
+      "deliveryDays": {
+        "min": 8,
+        "max": 12
+      },
+      "pricing": {
+        "setupCost": 30000,
+        "monthlyCost": 2800
+      }
+    },
+    "grinding": {
+      "name": "Schleifen",
+      "icon": "✨",
+      "description": "Automatisierte Oberflächenbearbeitung und Entgratung",
+      "hardware": {
+        "robot": "UR10e",
+        "gripper": "tool",
+        "payload": "12.5kg"
+      },
+      "template": "grinding_cell.usd",
+      "safetyZone": 2.0,
+      "typicalCycleTime": 15.0,
+      "deliveryDays": {
+        "min": 12,
+        "max": 14
+      },
+      "pricing": {
+        "setupCost": 45000,
+        "monthlyCost": 4000
+      }
+    }
+  }
+}
