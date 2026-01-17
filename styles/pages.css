@@ -133,19 +133,24 @@
     }
 }
 
-/* Robot/Factory Visualization placeholder */
+/* Robot/Factory Visualization */
 .hero__visual-content {
-    aspect-ratio: 1;
-    background: linear-gradient(135deg,
-            rgba(0, 212, 255, 0.1) 0%,
-            rgba(0, 212, 255, 0.02) 100%);
-    border: 1px solid rgba(0, 212, 255, 0.2);
+    aspect-ratio: 16/9;
     border-radius: var(--radius-2xl);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 8rem;
+    overflow: hidden;
+    box-shadow: var(--shadow-2xl), 0 0 60px rgba(0, 212, 255, 0.15);
     animation: float 4s ease-in-out infinite;
+}
+
+.hero__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.hero__visual-content:hover .hero__image {
+    transform: scale(1.03);
 }
 
 /* --------------------------------------------------------------------------
@@ -526,13 +531,28 @@
 }
 
 @keyframes pulseLine {
-    0%, 100% { opacity: 0.6; }
-    50% { opacity: 1; box-shadow: 0 0 10px var(--color-accent-glow); }
+
+    0%,
+    100% {
+        opacity: 0.6;
+    }
+
+    50% {
+        opacity: 1;
+        box-shadow: 0 0 10px var(--color-accent-glow);
+    }
 }
 
 @keyframes bounceRight {
-    0%, 100% { transform: translateX(0); }
-    50% { transform: translateX(4px); }
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    50% {
+        transform: translateX(4px);
+    }
 }
 
 /* Card Content */
@@ -589,18 +609,23 @@
 .process__total-fill {
     height: 100%;
     width: 100%;
-    background: linear-gradient(90deg, 
-        var(--color-accent-500) 0%, 
-        var(--color-accent-400) 50%,
-        var(--color-success-500) 100%);
+    background: linear-gradient(90deg,
+            var(--color-accent-500) 0%,
+            var(--color-accent-400) 50%,
+            var(--color-success-500) 100%);
     border-radius: var(--radius-full);
     animation: fillBar 2s ease-out forwards;
     transform-origin: left;
 }
 
 @keyframes fillBar {
-    from { transform: scaleX(0); }
-    to { transform: scaleX(1); }
+    from {
+        transform: scaleX(0);
+    }
+
+    to {
+        transform: scaleX(1);
+    }
 }
 
 .process__total-label {
@@ -630,11 +655,11 @@
         grid-template-columns: repeat(2, 1fr);
         gap: var(--space-6);
     }
-    
+
     .process__connector {
         display: none;
     }
-    
+
     .process__card {
         padding: var(--space-5);
     }
@@ -646,22 +671,22 @@
         grid-template-columns: 1fr;
         gap: var(--space-4);
     }
-    
+
     .process__card {
         display: flex;
         flex-direction: column;
         align-items: center;
     }
-    
+
     .process__card-icon {
         width: 64px;
         height: 64px;
     }
-    
+
     .process__card-emoji {
         font-size: 2rem;
     }
-    
+
     .process__card-description {
         min-height: auto;
     }
