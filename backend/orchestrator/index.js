@@ -120,7 +120,19 @@ class ServionicsOrchestrator {
 
             console.log(`[Orchestrator] Project ${projectId} completed in ${this.getDuration()}s`);
 
-            return offerResult;
+            // WICHTIG: Füge Phase 1 Analyse-Daten zum Ergebnis hinzu
+            // Damit das Frontend die Quality-Checks anzeigen kann!
+            return {
+                ...offerResult,
+                // Phase 1 Analyse-Daten für Frontend
+                basicQuality: qualityResult.basicQuality,
+                splattingSuitability: qualityResult.splattingSuitability,
+                keyframeCount: qualityResult.keyframeCount,
+                duration: qualityResult.duration,
+                resolution: qualityResult.resolution,
+                suggestions: qualityResult.suggestions,
+                feedback: qualityResult.feedback
+            };
 
         } catch (error) {
             console.error(`[Orchestrator] Pipeline failed:`, error);
@@ -139,6 +151,7 @@ class ServionicsOrchestrator {
 
     /**
      * Fast-fail response for quality gate
+     * Gibt alle Analyse-Daten zurück damit Frontend die Checks anzeigen kann
      */
     failFast(qualityResult) {
         console.log(`[Phase 1] Quality insufficient (${qualityResult.score}/100) - Returning feedback`);
@@ -147,10 +160,19 @@ class ServionicsOrchestrator {
             success: false,
             projectId: this.currentProject.id,
             phase: 'quality_gate',
+            // Alte Felder für Kompatibilität
             qualityScore: qualityResult.score,
             qualityLevel: qualityResult.level,
+            // Neue erweiterte Felder
+            score: qualityResult.score,
+            level: qualityResult.level,
+            basicQuality: qualityResult.basicQuality,
+            splattingSuitability: qualityResult.splattingSuitability,
             feedback: qualityResult.feedback,
-            suggestions: qualityResult.suggestions
+            suggestions: qualityResult.suggestions,
+            keyframeCount: qualityResult.keyframeCount,
+            duration: qualityResult.duration,
+            resolution: qualityResult.resolution
         };
     }
 
