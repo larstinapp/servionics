@@ -1,5 +1,6 @@
 [phases.setup]
-nixPkgs = ["nodejs_20"]
+# nodejs_20 includes npm, ffmpeg-full includes ffprobe for video analysis
+nixPkgs = ["nodejs_20", "ffmpeg-full"]
 
 [phases.install]
 cmds = ["cd backend && npm install"]
