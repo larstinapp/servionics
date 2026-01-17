@@ -269,13 +269,14 @@ function initUploadZone() {
       // Kurze Pause für visuelles Feedback
       await new Promise(resolve => setTimeout(resolve, 500));
 
-      // SCHRITT 5: Zeige das Ergebnis an
-      if (result.success) {
-        // Pipeline erfolgreich → Zeige Angebot
-        showOfferResult(result);
-      } else if (result.phase === 'quality_gate') {
-        // Quality Gate nicht bestanden → Zeige Feedback
+      // SCHRITT 5: Zeige IMMER die Analyse-Ergebnisse
+      // Der User will sehen, was am Video gut/schlecht war
+      if (result.phase === 'quality_gate' || result.basicQuality || result.splattingSuitability) {
+        // Zeige Analyse-Feedback (mit Offer-Button bei Erfolg)
         showQualityFeedback(result);
+      } else if (result.success) {
+        // Fallback: Wenn keine Analyse-Daten, zeige direkt Angebot
+        showOfferResult(result);
       } else {
         // Anderer Fehler
         showNotification(result.error || 'Ein Fehler ist aufgetreten', 'error');
@@ -426,11 +427,28 @@ function initUploadZone() {
           <p>📹 ${result.keyframeCount || 0} Keyframes analysiert • ⏱️ ${result.duration || 0}s Videolänge${result.resolution ? ` • 📐 ${result.resolution.width}x${result.resolution.height}` : ''}</p>
         </div>
         
-        <button class="btn btn--primary" onclick="location.reload()">Neues Video hochladen</button>
+        <div class="quality-feedback__actions">
+          ${result.success ? `
+            <button class="btn btn--primary" id="showOfferBtn">📊 Angebot ansehen</button>
+            <button class="btn btn--secondary" onclick="location.reload()">Neues Video</button>
+          ` : `
+            <button class="btn btn--primary" onclick="location.reload()">Neues Video hochladen</button>
+          `}
+        </div>
       </div>
     `;
 
     addEnhancedQualityFeedbackStyles();
+
+    // Event Listener für "Angebot ansehen" Button
+    if (result.success) {
+      const offerBtn = document.getElementById('showOfferBtn');
+      if (offerBtn) {
+        offerBtn.addEventListener('click', () => {
+          showOfferResult(result);
+        });
+      }
+    }
   }
 
   /**
@@ -741,6 +759,12 @@ function initUploadZone() {
         border-radius: var(--radius-md);
         font-size: var(--text-xs);
         color: var(--color-gray-500);
+      }
+      .quality-feedback__actions {
+        display: flex;
+        gap: var(--space-3);
+        justify-content: center;
+        margin-top: var(--space-4);
       }
       @media (max-width: 640px) {
         .quality-feedback__sections {
