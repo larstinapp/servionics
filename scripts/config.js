@@ -9,7 +9,7 @@ const ServionicsConfig = {
     // API Base URL - automatisch basierend auf Umgebung
     API_URL: window.location.hostname === 'localhost'
         ? 'http://localhost:3001'
-        : 'https://servionics-backend.up.railway.app', // Nach Railway Deploy anpassen!
+        : 'https://servionics-production.up.railway.app',
 
     // Basic Auth Credentials (für Production)
     // HINWEIS: In echter Production würde man Tokens nutzen, nicht Basic Auth
