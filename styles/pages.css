@@ -649,6 +649,24 @@
     background-clip: text;
 }
 
+/* Process Infographic */
+.process__infographic {
+    margin-top: var(--space-12);
+    text-align: center;
+}
+
+.process__infographic-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-2xl), 0 0 60px rgba(0, 212, 255, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.process__infographic-image:hover {
+    transform: scale(1.02);
+}
+
 /* Responsive: Tablet */
 @media (max-width: 1024px) {
     .process__horizontal {
