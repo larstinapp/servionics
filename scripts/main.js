@@ -291,62 +291,146 @@ function initUploadZone() {
   }
 
   /**
-   * Zeige Quality-Feedback wenn Score zu niedrig
+   * Zeige Quality-Feedback mit erweiterten Splatting-Checks
+   * ERKLÄRUNG: Zeigt jetzt sowohl Basic Quality als auch 3D-Rekonstruktions-Eignung
    */
   function showQualityFeedback(result) {
     const projectCheck = document.querySelector('.project-check__container');
     if (!projectCheck) return;
 
     const levelColors = {
+      'excellent': '#10B981',
       'good': '#10B981',
       'medium': '#F59E0B',
-      'poor': '#EF4444'
+      'acceptable': '#F59E0B',
+      'poor': '#EF4444',
+      'unknown': '#6B7280'
     };
 
     const levelLabels = {
+      'excellent': 'Hervorragend',
       'good': 'Gut',
       'medium': 'Mittel',
-      'poor': 'Schwach'
+      'acceptable': 'Akzeptabel',
+      'poor': 'Schwach',
+      'unknown': 'Unbekannt'
     };
 
+    // Neue Struktur: result hat jetzt basicQuality und splattingSuitability
+    const basicQuality = result.basicQuality || { score: result.qualityScore, metrics: result.metrics };
+    const splatting = result.splattingSuitability || {};
+    const overallScore = result.score || result.qualityScore || 0;
+    const overallLevel = result.level || result.qualityLevel || 'poor';
+
+    // Check-Namen für Deutsche Labels
+    const checkLabels = {
+      'cameraMotion': '📹 Kamerabewegung',
+      'frameOverlap': '🖼️ Frame-Überlappung',
+      'exposureConsistency': '💡 Belichtungs-Konsistenz',
+      'reflectiveSurfaces': '✨ Reflektierende Flächen',
+      'sceneStaticness': '🏛️ Szene statisch',
+      'featureDensity': '🎯 Feature-Dichte'
+    };
+
+    // Generiere Splatting-Checks HTML
+    let splattingChecksHtml = '';
+    if (splatting.checks) {
+      splattingChecksHtml = Object.entries(splatting.checks).map(([key, check]) => {
+        const color = check.score >= 70 ? '#10B981' : check.score >= 50 ? '#F59E0B' : '#EF4444';
+        const icon = check.score >= 70 ? '✓' : check.score >= 50 ? '⚠' : '✗';
+        return `
+          <div class="splatting-check">
+            <div class="splatting-check__header">
+              <span class="splatting-check__label">${checkLabels[key] || key}</span>
+              <span class="splatting-check__icon" style="color: ${color}">${icon}</span>
+            </div>
+            <div class="splatting-check__bar">
+              <div class="splatting-check__fill" style="width: ${check.score}%; background: ${color}"></div>
+            </div>
+            ${check.issue ? `<span class="splatting-check__issue">${check.issue}</span>` : ''}
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Estimated Quality für 3D-Rekonstruktion
+    const estimatedQuality = splatting.estimatedQuality || { level: 'unknown', description: 'Nicht analysiert' };
+
     projectCheck.innerHTML = `
-      <div class="quality-feedback">
+      <div class="quality-feedback quality-feedback--enhanced">
         <div class="quality-feedback__header">
-          <div class="quality-feedback__score" style="border-color: ${levelColors[result.qualityLevel]}">
-            <span class="quality-feedback__number">${result.qualityScore}</span>
-            <span class="quality-feedback__label">Qualität: ${levelLabels[result.qualityLevel]}</span>
+          <div class="quality-feedback__scores">
+            <div class="quality-feedback__score" style="border-color: ${levelColors[overallLevel]}">
+              <span class="quality-feedback__number">${overallScore}</span>
+              <span class="quality-feedback__label">Gesamt</span>
+            </div>
+            ${splatting.score !== undefined ? `
+              <div class="quality-feedback__score quality-feedback__score--secondary" style="border-color: ${levelColors[splatting.level]}">
+                <span class="quality-feedback__number">${splatting.score}</span>
+                <span class="quality-feedback__label">3D-Eignung</span>
+              </div>
+            ` : ''}
           </div>
-          <h3>Video-Qualität nicht ausreichend</h3>
-          <p class="text-muted">${result.feedback}</p>
+          <h3>${overallScore >= 70 ? 'Video geeignet für Analyse' : 'Video-Qualität nicht ausreichend'}</h3>
+          <p class="text-muted">${result.feedback || 'Bitte optimieren Sie das Video gemäß den Vorschlägen.'}</p>
         </div>
         
-        <div class="quality-feedback__suggestions">
-          <h4>Verbesserungsvorschläge:</h4>
-          <ul>
-            ${result.suggestions.map(s => `<li>💡 ${s}</li>`).join('')}
-          </ul>
+        ${result.suggestions && result.suggestions.length > 0 ? `
+          <div class="quality-feedback__suggestions">
+            <h4>💡 Verbesserungsvorschläge:</h4>
+            <ul>
+              ${result.suggestions.map(s => `<li>${s}</li>`).join('')}
+            </ul>
+          </div>
+        ` : ''}
+        
+        <div class="quality-feedback__sections">
+          <!-- Left: Basic Quality -->
+          <div class="quality-feedback__section">
+            <h4>Basis-Qualität</h4>
+            <div class="quality-feedback__metrics">
+              <div class="metric">
+                <span class="metric__label">Helligkeit</span>
+                <div class="metric__bar"><div class="metric__fill" style="width: ${basicQuality.metrics?.brightness || 0}%"></div></div>
+              </div>
+              <div class="metric">
+                <span class="metric__label">Schärfe</span>
+                <div class="metric__bar"><div class="metric__fill" style="width: ${basicQuality.metrics?.motionBlur || 0}%"></div></div>
+              </div>
+              <div class="metric">
+                <span class="metric__label">Frames</span>
+                <div class="metric__bar"><div class="metric__fill" style="width: ${basicQuality.metrics?.frameCount || 0}%"></div></div>
+              </div>
+              <div class="metric">
+                <span class="metric__label">Konsistenz</span>
+                <div class="metric__bar"><div class="metric__fill" style="width: ${basicQuality.metrics?.consistency || 0}%"></div></div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Right: Splatting Suitability -->
+          ${splattingChecksHtml ? `
+            <div class="quality-feedback__section">
+              <h4>3D-Rekonstruktions-Eignung</h4>
+              <div class="splatting-checks">
+                ${splattingChecksHtml}
+              </div>
+              <div class="splatting-quality" style="border-color: ${levelColors[estimatedQuality.level]}">
+                <strong>Erwartete Qualität:</strong> ${estimatedQuality.description}
+              </div>
+            </div>
+          ` : ''}
         </div>
         
-        <div class="quality-feedback__metrics">
-          <div class="metric">
-            <span class="metric__label">Helligkeit</span>
-            <div class="metric__bar"><div class="metric__fill" style="width: ${result.metrics?.brightness || 0}%"></div></div>
-          </div>
-          <div class="metric">
-            <span class="metric__label">Schärfe</span>
-            <div class="metric__bar"><div class="metric__fill" style="width: ${result.metrics?.motionBlur || 0}%"></div></div>
-          </div>
-          <div class="metric">
-            <span class="metric__label">Frames</span>
-            <div class="metric__bar"><div class="metric__fill" style="width: ${result.metrics?.frameCount || 0}%"></div></div>
-          </div>
+        <div class="quality-feedback__info">
+          <p>📹 ${result.keyframeCount || 0} Keyframes analysiert • ⏱️ ${result.duration || 0}s Videolänge${result.resolution ? ` • 📐 ${result.resolution.width}x${result.resolution.height}` : ''}</p>
         </div>
         
         <button class="btn btn--primary" onclick="location.reload()">Neues Video hochladen</button>
       </div>
     `;
 
-    addQualityFeedbackStyles();
+    addEnhancedQualityFeedbackStyles();
   }
 
   /**
@@ -487,6 +571,185 @@ function initUploadZone() {
         background: var(--color-accent-500);
         border-radius: var(--radius-full);
         transition: width 0.5s ease;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  /**
+   * CSS für Enhanced Quality Feedback mit Splatting-Checks
+   */
+  function addEnhancedQualityFeedbackStyles() {
+    if (document.getElementById('enhanced-quality-feedback-styles')) return;
+
+    const style = document.createElement('style');
+    style.id = 'enhanced-quality-feedback-styles';
+    style.textContent = `
+      .quality-feedback--enhanced {
+        text-align: center;
+        padding: var(--space-6);
+      }
+      .quality-feedback__scores {
+        display: flex;
+        justify-content: center;
+        gap: var(--space-4);
+        margin-bottom: var(--space-4);
+      }
+      .quality-feedback__score {
+        width: 90px;
+        height: 90px;
+        border: 3px solid;
+        border-radius: 50%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255,255,255,0.02);
+      }
+      .quality-feedback__score--secondary {
+        width: 80px;
+        height: 80px;
+        opacity: 0.9;
+      }
+      .quality-feedback__number {
+        font-size: var(--text-2xl);
+        font-weight: var(--font-bold);
+      }
+      .quality-feedback__label {
+        font-size: var(--text-xs);
+        color: var(--color-gray-400);
+      }
+      .quality-feedback__suggestions {
+        background: rgba(255,255,255,0.03);
+        border-radius: var(--radius-lg);
+        padding: var(--space-4);
+        margin: var(--space-4) 0;
+        text-align: left;
+      }
+      .quality-feedback__suggestions h4 {
+        font-size: var(--text-sm);
+        margin-bottom: var(--space-2);
+      }
+      .quality-feedback__suggestions ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      .quality-feedback__suggestions li {
+        padding: var(--space-1) 0;
+        color: var(--color-gray-300);
+        font-size: var(--text-sm);
+      }
+      .quality-feedback__sections {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-4);
+        margin: var(--space-4) 0;
+        text-align: left;
+      }
+      .quality-feedback__section {
+        background: rgba(255,255,255,0.02);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: var(--radius-lg);
+        padding: var(--space-4);
+      }
+      .quality-feedback__section h4 {
+        font-size: var(--text-sm);
+        margin-bottom: var(--space-3);
+        color: var(--color-gray-300);
+      }
+      .quality-feedback__metrics {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-2);
+      }
+      .metric {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+      }
+      .metric__label {
+        width: 70px;
+        font-size: var(--text-xs);
+        color: var(--color-gray-400);
+      }
+      .metric__bar {
+        flex: 1;
+        height: 6px;
+        background: rgba(255,255,255,0.1);
+        border-radius: var(--radius-full);
+        overflow: hidden;
+      }
+      .metric__fill {
+        height: 100%;
+        background: var(--color-accent-500);
+        border-radius: var(--radius-full);
+        transition: width 0.5s ease;
+      }
+      .splatting-checks {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-2);
+      }
+      .splatting-check {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-1);
+      }
+      .splatting-check__header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .splatting-check__label {
+        font-size: var(--text-xs);
+        color: var(--color-gray-300);
+      }
+      .splatting-check__icon {
+        font-size: var(--text-sm);
+        font-weight: bold;
+      }
+      .splatting-check__bar {
+        height: 4px;
+        background: rgba(255,255,255,0.1);
+        border-radius: var(--radius-full);
+        overflow: hidden;
+      }
+      .splatting-check__fill {
+        height: 100%;
+        border-radius: var(--radius-full);
+        transition: width 0.5s ease;
+      }
+      .splatting-check__issue {
+        font-size: 10px;
+        color: var(--color-gray-500);
+        font-style: italic;
+      }
+      .splatting-quality {
+        margin-top: var(--space-3);
+        padding: var(--space-2) var(--space-3);
+        background: rgba(255,255,255,0.02);
+        border-left: 3px solid;
+        border-radius: var(--radius-sm);
+        font-size: var(--text-xs);
+        color: var(--color-gray-300);
+      }
+      .quality-feedback__info {
+        margin: var(--space-4) 0;
+        padding: var(--space-2);
+        background: rgba(255,255,255,0.02);
+        border-radius: var(--radius-md);
+        font-size: var(--text-xs);
+        color: var(--color-gray-500);
+      }
+      @media (max-width: 640px) {
+        .quality-feedback__sections {
+          grid-template-columns: 1fr;
+        }
+        .quality-feedback__scores {
+          flex-direction: column;
+          align-items: center;
+        }
       }
     `;
     document.head.appendChild(style);
