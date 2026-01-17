@@ -30,7 +30,8 @@ app.use(express.urlencoded({ extended: true }));
 // ERKLÄRUNG: Schützt alle /api Routen mit Passwort
 const basicAuth = (req, res, next) => {
     // Health check immer erlauben (für Railway)
-    if (req.path === '/api/health') return next();
+    // req.path ist relativ zu /api, also nur /health
+    if (req.path === '/health') return next();
 
     // In Development überspringen
     if (process.env.NODE_ENV !== 'production') return next();
