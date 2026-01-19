@@ -46,30 +46,34 @@ class Phase2Capture {
     }
 
     /**
-     * Call NVIDIA Gaussian Splatting NIM API
+     * Call NVIDIA Gaussian Splatting via local GPU Worker
      */
     async runGaussianSplatting(videoPath, projectId) {
-        console.log('[Phase2] Calling NVIDIA Gaussian Splatting NIM...');
+        console.log('[Phase2] Queueing job for GPU Worker...');
 
-        // TODO: Replace with actual NVIDIA NIM API call
-        // const response = await fetch(config.gaussianSplatting.endpoint, {
-        //   method: 'POST',
-        //   headers: {
-        //     'Authorization': `Bearer ${config.ngc.apiKey}`,
-        //     'Content-Type': 'application/json'
-        //   },
-        //   body: JSON.stringify({ video: videoPath })
-        // });
+        // Queue the job for the local GPU worker
+        const job = {
+            id: projectId,
+            videoPath: videoPath,
+            status: 'pending',
+            createdAt: new Date().toISOString()
+        };
 
-        // Mock response for development
-        await this.simulateProcessingTime(3000); // Simulate 3s processing
+        // Add to global job queue (in production, use Redis/DB)
+        global.splatJobs = global.splatJobs || [];
+        global.splatJobs.push(job);
 
+        console.log(`[Phase2] Job ${projectId} queued. Waiting for GPU Worker...`);
+
+        // For now, return immediately with pending status
+        // The worker will update the job when complete
         return {
             success: true,
-            cloudPath: path.join(config.output.processed, projectId, 'splat_cloud.ply'),
-            pointCount: 1245678,
-            duration: 3.2,
-            quality: 'high'
+            status: 'queued',
+            cloudPath: path.join(config.output.processed, projectId, 'scene.splat'),
+            pointCount: null, // Will be filled by worker
+            duration: null,
+            quality: 'pending'
         };
     }
 

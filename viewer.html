@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Servionics 3D Viewer - Gaussian Splatting Visualization">
+    <title>3D Viewer | Servionics</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/viewer.css">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>">
+
+    <!-- Import Map for ES Modules (CDN-based for browser compatibility) -->
+    <script type="importmap">
+    {
+      "imports": {
+        "@mkkellogg/gaussian-splats-3d": "https://esm.sh/@mkkellogg/gaussian-splats-3d@0.4.5",
+        "three": "https://esm.sh/three@0.162.0"
+      }
+    }
+    </script>
+</head>
+
+<body class="viewer-page">
+    <!-- Navigation (Minimal) -->
+    <nav class="viewer-nav">
+        <a href="dashboard.html" class="viewer-nav__back">
+            <span class="viewer-nav__back-icon">←</span>
+            <span>Zurück zum Dashboard</span>
+        </a>
+        <div class="viewer-nav__title">
+            <span class="viewer-nav__logo">S</span>
+            <span id="projectTitle">3D Viewer</span>
+        </div>
+        <div class="viewer-nav__actions">
+            <button class="viewer-btn viewer-btn--icon" id="btnFullscreen" title="Vollbild">
+                <span>⛶</span>
+            </button>
+            <button class="viewer-btn viewer-btn--icon" id="btnSettings" title="Einstellungen">
+                <span>⚙️</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Viewer Container -->
+    <main class="viewer-main">
+        <!-- Loading Overlay -->
+        <div class="viewer-loading" id="loadingOverlay">
+            <div class="viewer-loading__content">
+                <div class="viewer-loading__spinner"></div>
+                <h3 class="viewer-loading__title">3D-Modell wird geladen...</h3>
+                <div class="viewer-loading__progress">
+                    <div class="viewer-loading__progress-bar" id="loadingProgress" style="width: 0%"></div>
+                </div>
+                <p class="viewer-loading__text" id="loadingText">Initialisiere Viewer...</p>
+            </div>
+        </div>
+
+        <!-- 3D Canvas Container -->
+        <div class="viewer-canvas" id="viewerCanvas"></div>
+
+        <!-- Controls Overlay -->
+        <div class="viewer-controls">
+            <div class="viewer-controls__hint">
+                <span class="viewer-controls__hint-item">
+                    <kbd>🖱️ Links</kbd> Rotieren
+                </span>
+                <span class="viewer-controls__hint-item">
+                    <kbd>🖱️ Rechts</kbd> Verschieben
+                </span>
+                <span class="viewer-controls__hint-item">
+                    <kbd>Scroll</kbd> Zoom
+                </span>
+                <span class="viewer-controls__hint-item">
+                    <kbd>R</kbd> Reset
+                </span>
+            </div>
+        </div>
+
+        <!-- Info Panel -->
+        <div class="viewer-info" id="infoPanel">
+            <div class="viewer-info__header">
+                <h4>Projektdetails</h4>
+                <button class="viewer-info__toggle" id="toggleInfo">−</button>
+            </div>
+            <div class="viewer-info__content">
+                <div class="viewer-info__item">
+                    <span class="viewer-info__label">Projekt-ID</span>
+                    <span class="viewer-info__value" id="infoProjectId">-</span>
+                </div>
+                <div class="viewer-info__item">
+                    <span class="viewer-info__label">Punkte</span>
+                    <span class="viewer-info__value" id="infoPointCount">-</span>
+                </div>
+                <div class="viewer-info__item">
+                    <span class="viewer-info__label">Qualität</span>
+                    <span class="viewer-info__value" id="infoQuality">-</span>
+                </div>
+                <div class="viewer-info__item">
+                    <span class="viewer-info__label">FPS</span>
+                    <span class="viewer-info__value" id="infoFps">-</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error State -->
+        <div class="viewer-error" id="errorOverlay" style="display: none;">
+            <div class="viewer-error__content">
+                <div class="viewer-error__icon">⚠️</div>
+                <h3 class="viewer-error__title">Fehler beim Laden</h3>
+                <p class="viewer-error__text" id="errorText">Das 3D-Modell konnte nicht geladen werden.</p>
+                <div class="viewer-error__actions">
+                    <button class="btn btn--primary" id="btnRetry">Erneut versuchen</button>
+                    <a href="dashboard.html" class="btn btn--secondary">Zum Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Settings Modal -->
+    <div class="viewer-modal" id="settingsModal" style="display: none;">
+        <div class="viewer-modal__backdrop" id="modalBackdrop"></div>
+        <div class="viewer-modal__content">
+            <div class="viewer-modal__header">
+                <h3>Viewer-Einstellungen</h3>
+                <button class="viewer-modal__close" id="closeSettings">×</button>
+            </div>
+            <div class="viewer-modal__body">
+                <div class="viewer-setting">
+                    <label class="viewer-setting__label">Render-Qualität</label>
+                    <select class="viewer-setting__select" id="settingQuality">
+                        <option value="low">Niedrig (Performance)</option>
+                        <option value="medium" selected>Mittel</option>
+                        <option value="high">Hoch (Qualität)</option>
+                    </select>
+                </div>
+                <div class="viewer-setting">
+                    <label class="viewer-setting__label">Hintergrund</label>
+                    <select class="viewer-setting__select" id="settingBackground">
+                        <option value="dark" selected>Dunkel</option>
+                        <option value="light">Hell</option>
+                        <option value="gradient">Gradient</option>
+                    </select>
+                </div>
+                <div class="viewer-setting">
+                    <label class="viewer-setting__label">
+                        <input type="checkbox" id="settingGrid" checked>
+                        Grundraster anzeigen
+                    </label>
+                </div>
+                <div class="viewer-setting">
+                    <label class="viewer-setting__label">
+                        <input type="checkbox" id="settingAutoRotate">
+                        Auto-Rotation
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="scripts/config.js"></script>
+    <script type="module" src="scripts/viewer.js"></script>
+</body>
+
+</html>

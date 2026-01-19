@@ -16,12 +16,14 @@ const PORT = process.env.PORT || 3001;
 app.use(cors({
     origin: [
         'http://localhost:8000',
+        'http://localhost:8080',  // Dev server with SharedArrayBuffer headers
         'http://localhost:3000',
         'https://servionics.vercel.app',  // Für später
         /\.vercel\.app$/                   // Alle Vercel Preview URLs
     ],
     credentials: true
 }));
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -81,12 +83,12 @@ app.use((err, req, res, next) => {
     });
 });
 
-// Start server
-app.listen(PORT, () => {
+// Start server on 0.0.0.0 to allow WSL2 connections
+app.listen(PORT, '0.0.0.0', () => {
     console.log('═══════════════════════════════════════════════════');
     console.log('  SERVIONICS BACKEND ORCHESTRATOR');
     console.log('═══════════════════════════════════════════════════');
-    console.log(`  Server running on http://localhost:${PORT}`);
+    console.log(`  Server running on http://0.0.0.0:${PORT}`);
     console.log(`  API Docs: http://localhost:${PORT}/`);
     console.log('═══════════════════════════════════════════════════');
 });

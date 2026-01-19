@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Splat Viewer - Servionics</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0f;
+            font-family: 'Segoe UI', sans-serif;
+            overflow: hidden;
+        }
+
+        #viewer-container {
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(10, 10, 15, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            color: white;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 3px solid rgba(0, 210, 200, 0.2);
+            border-top-color: #00d2c8;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-text {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            color: #aaa;
+        }
+
+        .progress-bar {
+            width: 300px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #00d2c8, #00ffea);
+            transition: width 0.3s;
+        }
+
+        .info-box {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-size: 0.9rem;
+            z-index: 100;
+        }
+
+        .info-box h3 {
+            color: #00d2c8;
+            margin-bottom: 10px;
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px 25px;
+            border-radius: 25px;
+            color: #888;
+            font-size: 0.85rem;
+            z-index: 100;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="viewer-container"></div>
+
+    <div class="loading-overlay" id="loading">
+        <div class="loading-spinner"></div>
+        <div class="loading-text" id="loadingText">Initialisiere...</div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+    </div>
+
+    <div class="info-box" id="infoBox" style="display: none;">
+        <h3>🎮 Servionics Demo</h3>
+        <div>Szene: <strong id="sceneName">-</strong></div>
+        <div>FPS: <span id="fps">-</span></div>
+    </div>
+
+    <div class="controls" id="controls" style="display: none;">
+        🖱️ Links ziehen = Drehen | 🔄 Scroll = Zoom | R = Reset
+    </div>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "@mkkellogg/gaussian-splats-3d": "https://unpkg.com/@mkkellogg/gaussian-splats-3d@0.4.5/build/gaussian-splats-3d.module.min.js",
+            "three": "https://unpkg.com/three@0.162.0/build/three.module.js"
+        }
+    }
+    </script>
+
+    <script type="module">
+        import * as GaussianSplats3D from '@mkkellogg/gaussian-splats-3d';
+
+        const loadingEl = document.getElementById('loading');
+        const loadingText = document.getElementById('loadingText');
+        const progressFill = document.getElementById('progressFill');
+        const infoBox = document.getElementById('infoBox');
+        const controls = document.getElementById('controls');
+        const fpsEl = document.getElementById('fps');
+        const sceneNameEl = document.getElementById('sceneName');
+
+        // Sample splat files to try (smallest first)
+        const SAMPLE_SPLATS = [
+            {
+                name: 'Bonsai Tree',
+                url: 'https://huggingface.co/cakewalk/splat-data/resolve/main/bonsai/bonsai_30000.splat',
+                position: [0, 1, 0],
+                rotation: [0, 0, 0, 1],
+                scale: [1, 1, 1]
+            }
+        ];
+
+        async function init() {
+            loadingText.textContent = 'Initialisiere WebGL...';
+
+            try {
+                const container = document.getElementById('viewer-container');
+
+                // Create the viewer
+                const viewer = new GaussianSplats3D.Viewer({
+                    rootElement: container,
+                    cameraUp: [0, 1, 0],
+                    initialCameraPosition: [1, 0.5, 1],
+                    initialCameraLookAt: [0, 0, 0],
+                    selfDrivenMode: true,
+                    useBuiltInControls: true,
+                    dynamicScene: false,
+                    antialiased: true
+                });
+
+                loadingText.textContent = 'Lade 3D-Szene...';
+
+                const scene = SAMPLE_SPLATS[0];
+                sceneNameEl.textContent = scene.name;
+
+                // Load the splat
+                await viewer.addSplatScene(scene.url, {
+                    splatAlphaRemovalThreshold: 5,
+                    showLoadingUI: false,
+                    position: scene.position,
+                    rotation: scene.rotation,
+                    scale: scene.scale,
+                    progressiveLoad: true
+                });
+
+                progressFill.style.width = '100%';
+                loadingText.textContent = 'Starte Rendering...';
+
+                // Start rendering
+                viewer.start();
+
+                // Hide loading, show UI
+                setTimeout(() => {
+                    loadingEl.style.display = 'none';
+                    infoBox.style.display = 'block';
+                    controls.style.display = 'block';
+                }, 500);
+
+                // FPS counter
+                let frameCount = 0;
+                let lastTime = performance.now();
+
+                function updateFPS() {
+                    frameCount++;
+                    const now = performance.now();
+                    if (now - lastTime >= 1000) {
+                        fpsEl.textContent = frameCount;
+                        frameCount = 0;
+                        lastTime = now;
+                    }
+                    requestAnimationFrame(updateFPS);
+                }
+                updateFPS();
+
+                // Reset camera on R key
+                document.addEventListener('keydown', (e) => {
+                    if (e.key.toLowerCase() === 'r') {
+                        viewer.setCamera([1, 0.5, 1], [0, 0, 0]);
+                    }
+                });
+
+                console.log('✅ Viewer initialized successfully!');
+
+            } catch (error) {
+                console.error('Viewer error:', error);
+                loadingText.textContent = 'Fehler: ' + error.message;
+                loadingText.style.color = '#ff6b6b';
+            }
+        }
+
+        init();
+    </script>
+</body>
+
+</html>

@@ -66,6 +66,9 @@
                     <p class="dashboard-header__subtitle">Willkommen zurück, Thomas! Hier ist Ihr Projektüberblick.</p>
                 </div>
                 <div class="dashboard-header__actions">
+                    <a href="viewer.html?project=demo" class="btn btn--secondary">
+                        🎮 Demo 3D Viewer
+                    </a>
                     <a href="index.html#project-check" class="btn btn--primary">
                         + Neues Projekt
                     </a>
@@ -126,125 +129,12 @@
                     </div>
                 </div>
 
-                <div class="project-grid">
-                    <!-- Project 1: Active -->
-                    <div class="project-card project-card--active">
-                        <div class="project-card__header">
-                            <div class="project-card__status">
-                                <span class="status-dot status-dot--active"></span>
-                                <span>In Umsetzung</span>
-                            </div>
-                            <span class="project-card__id">#PRJ-2024-003</span>
-                        </div>
-
-                        <h3 class="project-card__title">CNC Maschinenbeladung</h3>
-                        <p class="project-card__location">📍 Werk Süd, Halle 3</p>
-
-                        <div class="project-card__progress">
-                            <div class="progress-bar">
-                                <div class="progress-bar__fill" style="width: 75%"></div>
-                            </div>
-                            <div class="progress-bar__labels">
-                                <span>Fortschritt</span>
-                                <span>75%</span>
-                            </div>
-                        </div>
-
-                        <div class="project-card__meta">
-                            <div class="project-card__meta-item">
-                                <span class="project-card__meta-label">Skill</span>
-                                <span class="project-card__meta-value">🔧 Maschinenbeladung</span>
-                            </div>
-                            <div class="project-card__meta-item">
-                                <span class="project-card__meta-label">Go-Live</span>
-                                <span class="project-card__meta-value">15. Jan 2026</span>
-                            </div>
-                        </div>
-
-                        <div class="project-card__actions">
-                            <button class="btn btn--ghost btn--small">Details</button>
-                            <button class="btn btn--secondary btn--small">Support</button>
-                        </div>
-                    </div>
-
-                    <!-- Project 2: Active -->
-                    <div class="project-card project-card--active">
-                        <div class="project-card__header">
-                            <div class="project-card__status">
-                                <span class="status-dot status-dot--pending"></span>
-                                <span>Vor-Ort-Check geplant</span>
-                            </div>
-                            <span class="project-card__id">#PRJ-2024-004</span>
-                        </div>
-
-                        <h3 class="project-card__title">Palettier-Station</h3>
-                        <p class="project-card__location">📍 Logistikzentrum Nord</p>
-
-                        <div class="project-card__progress">
-                            <div class="progress-bar">
-                                <div class="progress-bar__fill" style="width: 35%"></div>
-                            </div>
-                            <div class="progress-bar__labels">
-                                <span>Fortschritt</span>
-                                <span>35%</span>
-                            </div>
-                        </div>
-
-                        <div class="project-card__meta">
-                            <div class="project-card__meta-item">
-                                <span class="project-card__meta-label">Skill</span>
-                                <span class="project-card__meta-value">🎯 Palettieren</span>
-                            </div>
-                            <div class="project-card__meta-item">
-                                <span class="project-card__meta-label">Go-Live</span>
-                                <span class="project-card__meta-value">22. Jan 2026</span>
-                            </div>
-                        </div>
-
-                        <div class="project-card__actions">
-                            <button class="btn btn--ghost btn--small">Details</button>
-                            <button class="btn btn--secondary btn--small">Support</button>
-                        </div>
-                    </div>
-
-                    <!-- Project 3: Completed -->
-                    <div class="project-card project-card--completed">
-                        <div class="project-card__header">
-                            <div class="project-card__status">
-                                <span class="status-dot status-dot--success"></span>
-                                <span>Abgeschlossen</span>
-                            </div>
-                            <span class="project-card__id">#PRJ-2024-002</span>
-                        </div>
-
-                        <h3 class="project-card__title">Pick & Place Montage</h3>
-                        <p class="project-card__location">📍 Werk Süd, Halle 1</p>
-
-                        <div class="project-card__progress">
-                            <div class="progress-bar progress-bar--success">
-                                <div class="progress-bar__fill" style="width: 100%"></div>
-                            </div>
-                            <div class="progress-bar__labels">
-                                <span>Abgeschlossen</span>
-                                <span>100%</span>
-                            </div>
-                        </div>
-
-                        <div class="project-card__meta">
-                            <div class="project-card__meta-item">
-                                <span class="project-card__meta-label">Skill</span>
-                                <span class="project-card__meta-value">📦 Pick & Place</span>
-                            </div>
-                            <div class="project-card__meta-item">
-                                <span class="project-card__meta-label">Go-Live</span>
-                                <span class="project-card__meta-value">02. Jan 2026</span>
-                            </div>
-                        </div>
-
-                        <div class="project-card__actions">
-                            <button class="btn btn--ghost btn--small">Bericht</button>
-                            <button class="btn btn--secondary btn--small">Monitoring</button>
-                        </div>
+                <!-- Dynamic Project List - Loaded from API -->
+                <div class="project-grid" id="project-list">
+                    <!-- Projects loaded dynamically by dashboard.js -->
+                    <div class="empty-state">
+                        <div class="empty-state__icon">⏳</div>
+                        <h3 class="empty-state__title">Lade Projekte...</h3>
                     </div>
                 </div>
             </section>

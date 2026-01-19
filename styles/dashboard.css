@@ -732,3 +732,42 @@
 .footer--dashboard {
     padding: var(--space-6) 0;
 }
+
+/* --------------------------------------------------------------------------
+   Empty State (No Projects)
+   -------------------------------------------------------------------------- */
+.empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: var(--space-12) var(--space-6);
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-xl);
+}
+
+.empty-state__icon {
+    font-size: 3rem;
+    margin-bottom: var(--space-4);
+    opacity: 0.5;
+}
+
+.empty-state__title {
+    font-size: var(--text-lg);
+    font-weight: var(--font-semibold);
+    margin-bottom: var(--space-2);
+    color: var(--color-gray-300);
+}
+
+.empty-state__text {
+    font-size: var(--text-sm);
+    color: var(--color-gray-500);
+    margin-bottom: var(--space-6);
+}
+
+.status-dot--complete {
+    background: var(--color-success-500);
+}
+
+.status-dot--failed {
+    background: var(--color-error-500);
+}
